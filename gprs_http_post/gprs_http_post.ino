@@ -37,7 +37,7 @@ void setup() {
   delay(2000);
   ShowSerialData();
   delay(2000);
-  Serial.print("AT+CIPSTATUS");
+  Serial.print("AT+CIPSTATUS\r\n");
   SIM900.println("AT+CIPSTATUS"); /* Initialize HTTP service */
   delay(2000); 
   ShowSerialData();

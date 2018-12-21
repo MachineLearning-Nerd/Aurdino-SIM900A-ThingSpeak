@@ -1,0 +1,40 @@
+AT
+OK If your response contains this, This string should tell you all is well.
+
+AT+CPIN?
++CPIN: READY If your response contains this, then it means SIM is unlocked and ready.
+
+AT+CREG?
++CREG: 0,1 This string in the response indicates SIM is registered.
+
+AT+CGATT?
++CGATT: 1 A response containing this string indicates GPRS is attached.
+
+AT+CIPSHUT
+SHUT OK This string in the response represents all IP sessions shutdown.
+
+AT+CIPSTATUS
+STATE: IP INITIAL This string in the response indicates IP stack is initialized.
+
+AT+CIPMUX=0
+OK This string indicates single connection mode set successfully at SIM 900A.
+
+AT+CGDCONT=1,"IP","airtelgprs.com"
+OK If your response contains this, This string should tell you all is well.
+
+AT+CSTT="airtelgprs.com","",""
+OK If your response contains this, This string should tell you all is well.
+
+AT+CIICR
+OK indicates wireless is up.
+
+AT+CIFSR
+If previous command is successful, you should an IP address in the response.
+
+AT+CIPSTART= "TCP","184.106.153.149","80"
+CONNECT OK This string in the response indicates TCP connection established.
+
+AT+CIPSEND=44
+> GET /update?key=D483VK7ABLHOIMA5&field1=32
+
+
