@@ -7,8 +7,11 @@ SoftwareSerial mySerial(3, 2);
 
 void setup()
 {
+  
   mySerial.begin(4800);                 
-  Serial.begin(4800);                  
+  Serial.begin(4800); 
+  Serial.println("SYSTEM STARTS...");
+                  
 }
 
 void loop()
