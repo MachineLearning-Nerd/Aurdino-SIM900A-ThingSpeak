@@ -34,15 +34,15 @@ int flag = 0;
 
 /*This are the functions for SD CARD*/
  void initializeSD();
- int createFile(char filename[]);
+ char createFile(char filename[]);
  int writeToFile(char text[]);
  void closeFile();
- int openFile(char filename[]);
+ char openFile(char filename[]);
 
  void GSMinitialization();
  void ShowSerialData();
- void SendData(int data);
- int CalculateDigit(int num);
+ void SendData(unsigned int datadine);
+ char CalculateDigit(unsigned int num);
 
 void setup()
 {
@@ -75,8 +75,8 @@ void setup()
   
   delay(2000);
   GSMinitialization();
-  delay(2000);
-  SendData(5);
+//  delay(2000);
+
 //  SendData(85);
 //  SendData(185);
 
@@ -216,7 +216,10 @@ void loop () {
     Serial.print(" minutes");
     Serial.println();
 
-
+    int minut = sittime / 60;
+    Serial.println(minut);
+    Serial.println("Minutes");
+//    SendData(5);
   }
 }
  void initializeSD()
@@ -234,7 +237,7 @@ void loop () {
   }
 }
 
- int createFile(char filename[])
+ char createFile(char filename[])
 {
   myFile = SD.open(filename, FILE_WRITE);
 
@@ -273,7 +276,7 @@ void loop () {
   }
 }
 
- int openFile(char filename[])
+ char openFile(char filename[])
 {
   myFile = SD.open(filename);
   if (myFile)
@@ -347,7 +350,7 @@ void loop () {
 }
 
 
- void SendData(int data)
+ void SendData(unsigned int datadine)
 {
   delay(2000);
   SIM900.println("AT+CIPSHUT"); /* Query the GPRS context */
@@ -358,7 +361,7 @@ void loop () {
   delay(2000);
   ShowSerialData();
   delay(5000);
-  int digits = CalculateDigit(data);
+  char digits = CalculateDigit(datadine);
   if(digits == 1)
   {
     SIM900.println("AT+CIPSEND=43"); /* Close GPRS context */
@@ -375,18 +378,18 @@ void loop () {
     delay(2000);
     ShowSerialData();
     delay(2000);    
-    int sensorValue = data;
+//    unsigned int sensorValue = datadine;
     String stringOne = "GET /update?key=D483VK7ABLHOIMA5&field1=";
-    String stringThree = stringOne + sensorValue;
+    String stringThree = stringOne + datadine;
     SIM900.println(stringThree); /* Close GPRS context */
     delay(2000);
     ShowSerialData();  
     delay(2000);
 }
 
- int CalculateDigit(int num)
+ char CalculateDigit(unsigned int num)
 {
-    int count=0;
+    char count=0;
     /* Run loop till num is greater than 0 */
     while(num != 0)
     {
