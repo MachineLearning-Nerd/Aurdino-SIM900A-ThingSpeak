@@ -18,15 +18,16 @@
 SoftwareSerial SIM900(7, 6);
 
 /* This is the pin assignments*/
-int CS_PIN = 10;
-const int buttonPin = 5;
-
+//int CS_PIN = 10;
+//const int buttonPin = 5;
+#define CS_PIN 10
+#define buttonPin  5
 /*This is the variable to save the file in the SD Card*/
 File myFile;
 RTC_DS1307 RTC;
 char* filename = "ctest.txt";
 
-//Variables
+////Variables
 int buttonState = 0;
 int SWPrestime = 0;
 int SWReleatime = 0;
@@ -47,7 +48,7 @@ int flag = 0;
 void setup()
 {
   SIM900.begin(4800);  /* Define baud rate for software serial communication */
-  Serial.begin(115200);
+  // Serial.begin(115200);
   // TWI is enabled for RTC
   Wire.begin();
   RTC.begin();
@@ -55,7 +56,7 @@ void setup()
   // Check to see if the RTC is keeping time.  If it is, load the time from your computer.
   if (! RTC.isrunning())
   {
-    Serial.println("RTC Date : Compile Time:");
+//    Serial.println("RTC Date : Compile Time:");
     // This will reflect the time that your sketch was compiled
     RTC.adjust(DateTime(__DATE__, __TIME__));
   }
@@ -100,6 +101,7 @@ void setup()
 }
 
 void loop () {
+  
   //Read button state (pressed or not pressed?)
   buttonState = digitalRead(buttonPin);
 
@@ -135,19 +137,19 @@ void loop () {
 
       myFile.close();
 
-      Serial.print("Sitting Time : ");
-      Serial.print(SwitchPressed.day(), DEC);
-      Serial.print('/');
-      Serial.print(SwitchPressed.month(), DEC);
-      Serial.print('/');
-      Serial.print(SwitchPressed.year(), DEC);
-      Serial.print(' ');
-      Serial.print(SwitchPressed.hour(), DEC);
-      Serial.print(':');
-      Serial.print(SwitchPressed.minute(), DEC);
-      Serial.print(':');
-      Serial.print(SwitchPressed.second(), DEC);
-      Serial.print("   ");
+//      Serial.print("Sitting Time : ");
+//      Serial.print(SwitchPressed.day(), DEC);
+//      Serial.print('/');
+//      Serial.print(SwitchPressed.month(), DEC);
+//      Serial.print('/');
+//      Serial.print(SwitchPressed.year(), DEC);
+//      Serial.print(' ');
+//      Serial.print(SwitchPressed.hour(), DEC);
+//      Serial.print(':');
+//      Serial.print(SwitchPressed.minute(), DEC);
+//      Serial.print(':');
+//      Serial.print(SwitchPressed.second(), DEC);
+//      Serial.print("   ");
 
       flag = 1; //change flag variable
     }
@@ -181,26 +183,26 @@ void loop () {
     }
     myFile.close();
 
-    Serial.print("Standing Time : ");
-    Serial.print(Switchreleased.day(), DEC);
-    Serial.print('/');
-    Serial.print(Switchreleased.month(), DEC);
-    Serial.print('/');
-    Serial.print(Switchreleased.year(), DEC);
-    Serial.print(' ');
-    Serial.print(Switchreleased.hour(), DEC);
-    Serial.print(':');
-    Serial.print(Switchreleased.minute(), DEC);
-    Serial.print(':');
-    Serial.print(Switchreleased.second(), DEC);
-    Serial.print("   ");
+//    Serial.print("Standing Time : ");
+//    Serial.print(Switchreleased.day(), DEC);
+//    Serial.print('/');
+//    Serial.print(Switchreleased.month(), DEC);
+//    Serial.print('/');
+//    Serial.print(Switchreleased.year(), DEC);
+//    Serial.print(' ');
+//    Serial.print(Switchreleased.hour(), DEC);
+//    Serial.print(':');
+//    Serial.print(Switchreleased.minute(), DEC);
+//    Serial.print(':');
+//    Serial.print(Switchreleased.second(), DEC);
+//    Serial.print("   ");
     myFile = SD.open(filename, FILE_WRITE);
     if (myFile) {
       myFile.print("Total Sitting Time : ");
     }
     myFile.close();
 
-    Serial.print("Total Sitting Time : ");
+//    Serial.print("Total Sitting Time : ");
 
     int sittime = 0;
     sittime = SWReleatime - SWPrestime;
@@ -212,13 +214,13 @@ void loop () {
 
     }
     myFile.close();
-    Serial.print(sittime / 60, DEC);
-    Serial.print(" minutes");
-    Serial.println();
+//    Serial.print(sittime / 60, DEC);
+//    Serial.print(" minutes");
+//    Serial.println();
 
     unsigned int minut = sittime / 60;
-    Serial.println(minut);
-    Serial.println("Minutes");
+//    Serial.println(minut);
+//    Serial.println("Minutes");
 //    delay(2000);
     SIM900.println("AT+CIPSHUT"); /* Query the GPRS context */
 //    delay(2000);
@@ -229,44 +231,45 @@ void loop () {
     ShowSerialData();
     delay(2000);
   
-//    char digits = CalculateDigit(minut);
-//    if(digits == 1)
-//    {
-//      SIM900.println("AT+CIPSEND=43"); /* Close GPRS context */
-//    } 
-//    else if(digits == 2)
-//    {
-//      SIM900.println("AT+CIPSEND=44"); /* Close GPRS context */   
-//    } 
-//    else if(digits == 3)
-//    {
-//      SIM900.println("AT+CIPSEND=45"); /* Close GPRS context */
-//  
-//    } 
-//      delay(2000);
-//      ShowSerialData();
-//      delay(2000);    
-//  //    unsigned int sensorValue = datadine;
+    char digits = CalculateDigit(minut);
+    if(digits == 1)
+    {
+      SIM900.println("AT+CIPSEND=43"); /* Close GPRS context */
+    } 
+    else if(digits == 2)
+    {
+      SIM900.println("AT+CIPSEND=44"); /* Close GPRS context */   
+    } 
+    else if(digits == 3)
+    {
+      SIM900.println("AT+CIPSEND=45"); /* Close GPRS context */
+  
+    } 
+      delay(2000);
+      ShowSerialData();
+      delay(2000);    
+  //    unsigned int sensorValue = datadine;
       String stringOne = "GET /update?key=D483VK7ABLHOIMA5&field1=";
       String stringThree = stringOne + minut;
-//      SIM900.println(stringThree); /* Close GPRS context */
-//      delay(2000);
-//      ShowSerialData();  
-//      delay(2000);  
-//    SendData(5);
+      SIM900.println(stringThree); /* Close GPRS context */
+      delay(2000);
+      ShowSerialData();  
+      delay(2000);  
+    SendData(5);
   }
 }
  void initializeSD()
 {
-  Serial.println("Initializing SD card...");
+//  Serial.println("Initializing SD card...");
+//  int CS_PIN = 10;
   pinMode(CS_PIN, OUTPUT);
 
   if (SD.begin())
   {
-    Serial.println("SD card is ready to use.");
+//    Serial.println("SD card is ready to use.");
   } else
   {
-    Serial.println("SD card initialization failed");
+//    Serial.println("SD card initialization failed");
     return;
   }
 }
@@ -277,11 +280,11 @@ void loop () {
 
   if (myFile)
   {
-    Serial.println("File created successfully.");
+//    Serial.println("File created successfully.");
     return 1;
   } else
   {
-    Serial.println("Error while creating file.");
+//    Serial.println("Error while creating file.");
     return 0;
   }
 }
@@ -291,12 +294,12 @@ void loop () {
   if (myFile)
   {
     myFile.println(text);
-    Serial.println("Writing to file: ");
-    Serial.println(text);
+//    Serial.println("Writing to file: ");
+//    Serial.println(text);
     return 1;
   } else
   {
-    Serial.println("Couldn't write to file");
+//    Serial.println("Couldn't write to file");
     return 0;
   }
 }
@@ -306,7 +309,7 @@ void loop () {
   if (myFile)
   {
     myFile.close();
-    Serial.println("File closed");
+//    Serial.println("File closed");
   }
 }
 
@@ -315,11 +318,11 @@ void loop () {
   myFile = SD.open(filename);
   if (myFile)
   {
-    Serial.println("File opened with success!");
+//    Serial.println("File opened with success!");
     return 1;
   } else
   {
-    Serial.println("Error opening file...");
+//    Serial.println("Error opening file...");
     return 0;
   }
 }
@@ -327,7 +330,7 @@ void loop () {
 
  void GSMinitialization()
 {
-  Serial.println("HTTP post method :");
+//  Serial.println("HTTP post method :");
 //  Serial.print("AT\r\n");
   SIM900.println("AT"); /* Check Communication */
   delay(2000);
@@ -378,7 +381,7 @@ void loop () {
 {
   while (SIM900.available() != 0)  /* If data is available on serial port */
   {
-    Serial.write(char (SIM900.read())); /* Print character received on to the serial monitor */
+//    Serial.write(char (SIM900.read())); /* Print character received on to the serial monitor */
   }
 //  Serial.println(" ");
 }

@@ -16,32 +16,11 @@ void setup() {
   delay(2000);
   ShowSerialData();  /* Print response on the serial monitor */
   delay(2000);
-//  /* Configure bearer profile 1 */
-//  Serial.print("AT+CPIN?\r\n");
-//  SIM900.println("AT+CPIN?"); /* Connection type GPRS */
-//  delay(2000);
-//  ShowSerialData();
-//  delay(2000);
-//  Serial.print("AT+CREG?\r\n");
-//  SIM900.println("AT+CREG?"); /* APN of the provider */
-//  delay(2000);
-//  ShowSerialData();
-//  delay(2000);
-//  Serial.print("AT+CGATT?\r\n");
-//  SIM900.println("AT+CGATT?");  /* Open GPRS context */
-//  delay(2000);
-//  ShowSerialData();
-//  delay(2000);
   Serial.print("AT+CIPSHUT\r\n");
   SIM900.println("AT+CIPSHUT"); /* Query the GPRS context */
   delay(2000);
   ShowSerialData();
   delay(2000);
-//  Serial.print("AT+CIPSTATUS\r\n");
-//  SIM900.println("AT+CIPSTATUS"); /* Initialize HTTP service */
-//  delay(2000);
-//  ShowSerialData();
-//  delay(2000);
   Serial.print("AT+CIPMUX=0\r\n");
   SIM900.println("AT+CIPMUX=0");  /* Set parameters for HTTP session */
   delay(2000);
