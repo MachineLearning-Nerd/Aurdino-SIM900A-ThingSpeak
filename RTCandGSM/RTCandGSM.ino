@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include "RTClib.h"
-
+#include <string.h>
 
 //Create software serial object to communicate with SIM900A
 
@@ -22,14 +22,14 @@ int flag = 0;
 
 
  void GSMinitialization();
- void ShowSerialData();
- void SendData(unsigned int datadine);
+ char ShowSerialData();
+ char SendData(unsigned int datadine);
  char CalculateDigit(unsigned int num);
-
- 
+ void SleepGSM(void);
+ void UnsleepGSM(void);
 void setup() {
   SIM900.begin(4800);  /* Define baud rate for software serial communication */
-  Serial.begin(4800); /* Define baud rate for serial communication */
+  Serial.begin(115200); /* Define baud rate for serial communication */
 
   Wire.begin();
   RTC.begin();
@@ -158,29 +158,73 @@ void loop() {
     unsigned int minut = sittime / 60;
     Serial.println(minut);
     Serial.println("Minutes");
-    SendData(minut);
+    
+    UnsleepGSM();
+    char mistake = 1;
+    while(mistake != 0){
+        mistake  = SendData(minut);
+      }
+    SleepGSM();
+    
   }
 }
 
-void ShowSerialData()
+char ShowSerialData()
 {
+  char myConcatenation[2]={'0','0'};
+  myConcatenation[0] = '0';
+  myConcatenation[1] = '0';
+  char index = 0;
+  char error = 0;
   while (SIM900.available() != 0) /* If data is available on serial port */
   {
-    Serial.write(char (SIM900.read())); /* Print character received on to the serial monitor */
+    char pchar = char(SIM900.read());
+    if (pchar == 'E' || myConcatenation[0] == 'E')
+    {
+      myConcatenation[index] = pchar;
+      index = index + 1;      
+      if (myConcatenation[1] == 'R')
+      {
+        Serial.println("There is an ERROR"); 
+        error = 1; 
+      }
+      else if(myConcatenation[1] != '0' && myConcatenation[1] != 'R')
+      {
+        index = 0;
+        myConcatenation[0] = '0';
+        myConcatenation[1] = '0';
+      
+      }      
+    }
+    Serial.write(pchar); /* Print character received on to the serial monitor */
+    
   }
+  return error;
+
 }
 
 
-void SendData(unsigned int data)
+char SendData(unsigned int data)
 {
+  char error = 0;
   delay(2000);
   SIM900.println("AT+CIPSHUT"); /* Query the GPRS context */
   delay(2000);
-  ShowSerialData();
+  error = ShowSerialData();
+  if (error == 1)
+  {
+    Serial.println("There is an ERROR");
+    return error;
+  }
   delay(5000);   
   SIM900.println("AT+CIPSTART= \"TCP\",\"184.106.153.149\",\"80\"");  /* Terminate HTTP service */
   delay(2000);
-  ShowSerialData();
+  error = ShowSerialData();
+  if (error == 1)
+  {
+    Serial.println("There is an ERROR");
+    return error;
+  }
   delay(5000);
   char digits = CalculateDigit(data);
   if(digits == 1)
@@ -196,16 +240,29 @@ void SendData(unsigned int data)
     SIM900.println("AT+CIPSEND=45"); /* Close GPRS context */
 
   } 
-    delay(2000);
-    ShowSerialData();
-    delay(2000);    
-    unsigned int sensorValue = data;
-    String stringOne = "GET /update?key=D483VK7ABLHOIMA5&field2=";
-    String stringThree = stringOne + sensorValue;
-    SIM900.println(stringThree); /* Close GPRS context */
-    delay(2000);
-    ShowSerialData();  
-    delay(2000);
+
+    
+  delay(2000);
+  error = ShowSerialData();
+  if (error == 1)
+  {
+    Serial.println("There is an ERROR");
+    return error;
+  }
+  delay(2000);    
+  unsigned int sensorValue = data;
+  String stringOne = "GET /update?key=D483VK7ABLHOIMA5&field2=";
+  String stringThree = stringOne + sensorValue;
+  SIM900.println(stringThree); /* Close GPRS context */
+  delay(2000);
+  error = ShowSerialData();
+  if (error == 1)
+  {
+    Serial.println("There is an ERROR");
+    return error;
+  }  
+  delay(2000);
+  return 0;
 }
 
 char CalculateDigit(unsigned int num)
@@ -225,4 +282,21 @@ char CalculateDigit(unsigned int num)
         num /= 10;
     }
     return count;
+}
+
+void SleepGSM(void)
+{
+  SIM900.println("AT+CSCLK=2"); /* Query the GPRS context */
+  delay(2000);
+  ShowSerialData();
+}
+
+void UnsleepGSM(void)
+{
+  SIM900.println("AT"); /* Query the GPRS context */
+  delay(2000);
+  ShowSerialData();
+  SIM900.println("AT+CSCLK=0"); /* Query the GPRS context */
+  delay(2000);
+  ShowSerialData();
 }

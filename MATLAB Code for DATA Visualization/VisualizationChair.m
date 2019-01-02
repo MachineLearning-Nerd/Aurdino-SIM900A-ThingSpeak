@@ -24,7 +24,7 @@ readAPIKey = 'P12WOODDOFSDBO7L';
 % Read first data variable
 % [data,timestamps] = thingSpeakRead(readChannelID, 'Field', fieldID1, 'ReadKey', readAPIKey);
 
-[data,timestamps] = thingSpeakRead(629298,'NumPoints',10,'ReadKey', readAPIKey);
+[data,timestamps] = thingSpeakRead(629298,'NumPoints',1000,'ReadKey', readAPIKey);
 % timestamps.TimeZone = 'Asia/Kolkata';
 % Read second data variable
 % data2 = thingSpeakRead(readChannelID, 'Field', fieldID2, 'NumPoints', 30, 'ReadKey', readAPIKey);
@@ -52,9 +52,10 @@ hold on
 h1 = area(background(:,1));
 grid on
 h1.FaceColor = [0 1 0];
-xticks(1:m)
-xticklabels(time)
-xtickangle(45)
+% xticks(1:m)
+% xticklabels(1:m)
+% xtickangle(45)
+xlim([1 m])
 xlabel("Date & time")
 ylabel("Sitting minutes")
 
@@ -65,7 +66,7 @@ ylim([0 max(fieldata)])
 
 
 %% Visualize Data
-plot(fieldata,'ks','LineWidth',2,'MarkerSize',15,'MarkerFaceColor','k');
+plot(fieldata,'ks-','LineWidth',2,'MarkerSize',2,'MarkerFaceColor','k');
 grid on
 % ylim([0 15])
 hold off

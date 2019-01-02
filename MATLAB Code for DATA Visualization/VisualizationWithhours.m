@@ -10,7 +10,7 @@
 readChannelID = 629298;
 % TODO - Replace the [] with the Field ID to read data from:
 fieldID1 = [1];
-field = 1;
+field = 2;
 % TODO - Replace the [] with the Field ID to read data from:
 % fieldID2 = [];
 
@@ -53,7 +53,7 @@ hourdays = mindays'/60; % 60 converting hour from minute
 time = (string(days));
 
 [m , n] = size(hourdays);
-C = max(hourdays)*ones(m,1);
+C = 15*ones(m,1);
 D = 10*ones(m,1);
 background = [C D];
 
@@ -89,16 +89,21 @@ else
     xticks(1:m)
     xticklabels(time)
     xtickangle(0)
+    
+    yticks(0:15)
+    yticklabels(0:15)
+    ytickangle(0)
+    
     xlabel("Days")
     ylabel("Sitting Hours in a Day")
     h2 = area(background(:,2));
     grid on
     h2.FaceColor = [1 0 0];
-    ylim([0 max(hourdays)])
+    ylim([0 15])
 
 
     %% Visualize Data
-    plot(hourdays,'ks','LineWidth',2,'MarkerSize',15,'MarkerFaceColor','k');
+    plot(hourdays,'ks-','LineWidth',2,'MarkerSize',5,'MarkerFaceColor','k');
     grid on
     % ylim([0 15])
     hold off
