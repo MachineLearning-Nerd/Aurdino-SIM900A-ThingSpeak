@@ -1,12 +1,12 @@
 #include <string.h>
 #include <SPI.h>
 #include <SD.h>
-#include <SFE_BMP180.h>
+#include <Adafruit_BMP085.h>
 #include <Wire.h>
 
 // You will need to create an SFE_BMP180 object, here called "pressure":
 
-SFE_BMP180 pressure;
+Adafruit_BMP085 pressure;
 double baseline; // baseline pressure
 
 class DateTime 
@@ -32,7 +32,7 @@ int buttonState = 0;
 unsigned int SWPrestime = 0;
 unsigned int SWReleatime = 0;
 int flag = 0;
-
+#define pressurethreshold 101900
 
 void GSMinitialization();
 char ShowSerialData();
@@ -72,7 +72,7 @@ void setup() {
 
   // Get the baseline pressure:
   
-  baseline = getPressure();
+  baseline = pressure.readPressure();
   Serial.print("baseline pressure: ");
   Serial.print(baseline);
   Serial.println(" mb");
@@ -139,21 +139,21 @@ void loop() {
   
   // Get a new pressure reading:
 
-  PressureState = getPressure();
+  PressureState = pressure.readPressure();
 
 
   //Read button state (pressed or not pressed?)
   buttonState = digitalRead(buttonPin);
-  DifferencePressure = PressureState - 1017;
+  DifferencePressure = PressureState ;
 //  Serial.print("baseline pressure: ");
 //  Serial.print(PressureState);
-//  Serial.println(" mb"); 
+//  Serial.println(" Pa"); 
   //If button pressed...
 //  delay(500);
-  if (DifferencePressure > 0.5) {
-    Serial.print("baseline pressure: ");
-    Serial.print(DifferencePressure);
-    Serial.println(" mb");  
+  if (DifferencePressure > pressurethreshold) {
+//    Serial.print("baseline pressure: ");
+//    Serial.print(DifferencePressure);
+//    Serial.println(" mb");  
     
     delay(1000);
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
@@ -202,7 +202,7 @@ void loop() {
       flag = 1; //change flag variable
     }
   }
-  else if (DifferencePressure < 0.5 && flag == 1) {
+  else if (DifferencePressure < pressurethreshold && flag == 1) {
       flag = 0;
       delay(1000);
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
@@ -212,7 +212,7 @@ void loop() {
 
       myFile = SD.open(filename, FILE_WRITE);
       if (myFile) {
-        myFile.print("Sitting Time : ");
+        myFile.print("Standing Time : ");
         myFile.print(Switchreleased.days, DEC);
         myFile.print('/');
         myFile.print(Switchreleased.months, DEC);
@@ -362,17 +362,17 @@ char SendData(unsigned int data)
   }
   delay(2000);    
   unsigned int sensorValue = data;
-  String stringOne = "GET /update?key=D483VK7ABLHOIMA5&field2=";
+  String stringOne = "GET /update?key=3ACH418J0ADT3H0J&field1=";
   String stringThree = stringOne + sensorValue;
   Serial1.println(stringThree); /* Close GPRS context */
-  delay(2000);
+  delay(3000);
   error = ShowSerialData();
   if (error == 1)
   {
     Serial.println("There is an ERROR");
     return error;
   }  
-  delay(2000);
+  delay(5000);
   return 0;
 }
 
@@ -581,63 +581,4 @@ void GSMinitialization()
     Serial1.println("AT+CCLK?"); /* Start POST session */
     delay(2000);
     ShowSerialData();
-}
-
-
-double getPressure()
-{
-  char status;
-  double T,P,p0,a;
-
-  // You must first get a temperature measurement to perform a pressure reading.
-  
-  // Start a temperature measurement:
-  // If request is successful, the number of ms to wait is returned.
-  // If request is unsuccessful, 0 is returned.
-
-  status = pressure.startTemperature();
-  if (status != 0)
-  {
-    // Wait for the measurement to complete:
-
-    delay(status);
-
-    // Retrieve the completed temperature measurement:
-    // Note that the measurement is stored in the variable T.
-    // Use '&T' to provide the address of T to the function.
-    // Function returns 1 if successful, 0 if failure.
-
-    status = pressure.getTemperature(T);
-    if (status != 0)
-    {
-      // Start a pressure measurement:
-      // The parameter is the oversampling setting, from 0 to 3 (highest res, longest wait).
-      // If request is successful, the number of ms to wait is returned.
-      // If request is unsuccessful, 0 is returned.
-
-      status = pressure.startPressure(3);
-      if (status != 0)
-      {
-        // Wait for the measurement to complete:
-        delay(status);
-
-        // Retrieve the completed pressure measurement:
-        // Note that the measurement is stored in the variable P.
-        // Use '&P' to provide the address of P.
-        // Note also that the function requires the previous temperature measurement (T).
-        // (If temperature is stable, you can do one temperature measurement for a number of pressure measurements.)
-        // Function returns 1 if successful, 0 if failure.
-
-        status = pressure.getPressure(P,T);
-        if (status != 0)
-        {
-          return(P);
-        }
-        else Serial.println("error retrieving pressure measurement\n");
-      }
-      else Serial.println("error starting pressure measurement\n");
-    }
-    else Serial.println("error retrieving temperature measurement\n");
-  }
-  else Serial.println("error starting temperature measurement\n");
 }
